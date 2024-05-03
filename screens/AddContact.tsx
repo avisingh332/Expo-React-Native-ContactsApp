@@ -31,23 +31,25 @@ const AddContact = () => {
     })
   }
   const handleSubmit = async () =>{
-    // console.log(inputForm);
-    // await dropTable(db);
+    
     // await listTables(db);
     // await createTables(db);
     // await getColumns(db);
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if(inputForm.email==''|| !emailRegex.test(inputForm.email) ||inputForm.name==''|| inputForm.phoneNumber==''){
-      Alert.alert("Input Correct values");
-      return;
-    }
-    await addContact(db,inputForm);
-    setInputForm({
-      name:'',
-      phoneNumber:'', 
-      email:''
-    })
-    await getContacts(db);
+    // const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    // if(inputForm.email==''|| !emailRegex.test(inputForm.email) ||inputForm.name==''|| inputForm.phoneNumber==''){
+    //   Alert.alert("Input Correct values");
+    //   return;
+    // }
+    // await listTables(db);
+    // await addContact(db,inputForm);
+    // setInputForm({
+    //   name:'',
+    //   phoneNumber:'', 
+    //   email:''
+    // })
+    // await getColumns(db);
+    // listTables(db);
+    // await getContacts(db);
   }
   return (
     <ScrollView>

@@ -2,20 +2,23 @@ import * as SQLite from 'expo-sqlite';
 
 export const connectToDb = async() =>{
     try{
-        const db = SQLite.openDatabase("contactAppDB.db");
-        console.log("Database Connected Successfully");
+        const db = SQLite.openDatabase("contactAppDB.db",undefined, undefined, undefined, (db)=>{
+            console.log("Database Created Successfully");
+        });
+        // console.log("Database Connected Successfully");
         return db;
     }catch(error){
         throw Error("Failed to connect to database")
     }
 }
+
 export const dropTable = async(db:SQLite.SQLiteDatabase) =>{
     const query =`
     DROP TABLE IF EXISTS contacts;
     `;
     try{
         db.transaction(tx=>{
-            tx.executeSql(query,null,
+            tx.executeSql(query,[],
                 (txObj,resultSet) => console.log("Deleted Table Successfully"),
                 (txObj, error) => {console.log(error); return true} ,
             );
@@ -25,20 +28,21 @@ export const dropTable = async(db:SQLite.SQLiteDatabase) =>{
         console.log(error);
     }
 }
+
 export const createTables = async(db:SQLite.SQLiteDatabase) => {
     const contactQuery = `
-    CREATE TABLE IF NOT EXISTS contacts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        Name TEXT,
-        PhoneNumber TEXT,
-        Email TEXT
-    );
-    `;
+        CREATE TABLE IF NOT EXISTS contacts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Name TEXT,
+            PhoneNumber TEXT,
+            Email TEXT
+        );
+    `
     try{
        db.transaction(tx=>{
-        tx.executeSql(contactQuery,null,
+        tx.executeSql(contactQuery,[],
             (txObj,resultSet)=> console.log("Created Table Successfully"),
-            (txObj,error)=> {console.log(error); return true;}
+            (txObj,error)=> {throw error}
         )
        });
        
@@ -68,6 +72,7 @@ export const getContacts = async (db: SQLite.SQLiteDatabase):Promise<any[]> => {
         throw Error("Failed to get Contacts from database")
     }
 }
+
 export const addContact = async (db: SQLite.SQLiteDatabase, values) => {
     // Insert query with placeholders for dynamic values
     const query = `
@@ -89,17 +94,31 @@ export const addContact = async (db: SQLite.SQLiteDatabase, values) => {
     });
 };
 
-export const listTables = async(db: SQLite.SQLiteDatabase)=>{
+export const listTables = (db:SQLite.SQLiteDatabase) => {
+
     const query = `
-    SELECT name FROM sqlite_schema WHERE type='table' ORDER BY name
-    `
-    db.transaction(tx =>{
-        tx.executeSql(query, null, 
-            (txObj, resultSet)=>console.log(resultSet.rows._array),
-            (txOjb, error)=>{console.log(error); return true;},
-        )
-    });
-}
+      SELECT name FROM sqlite_schema WHERE type = 'table' ORDER BY name
+    `;
+  
+    try {
+      db.transaction((tx) => {
+        tx.executeSql(
+          query,
+          [], // You should use an empty array instead of `null` for parameters
+          (txObj, resultSet) => {
+            console.log("Table Names:", resultSet.rows._array);
+            console.log("Success");
+          },
+          (txObj, error) => {
+            console.error("Error retrieving table names:", error);
+            return false;
+          }
+        );
+      });
+    } catch (error) {
+      console.error("Transaction failed:", error);
+    }
+  };
 
 export const getColumns = async(db:SQLite.SQLiteDatabase) =>{
     const query = `

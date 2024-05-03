@@ -62,6 +62,7 @@ const HomeScreen = ({navigation}) => {
     var res: any[] = null;
     res= await getContacts(db);
     setContactList(res);
+    console.log(res);
   },[]);
 
   useEffect(()=>{
@@ -117,7 +118,7 @@ const HomeScreen = ({navigation}) => {
         onPress={()=>{navigation.navigate('AddContact')}}
         >
           <AntDesign name="pluscircle" size={40} color="black"/>
-          <Text> Avinash Singh </Text>
+          <Text> Add New Contact </Text>
         </TouchableOpacity>
     </View>
   )
@@ -166,8 +167,8 @@ var styles = StyleSheet.create({
   },
   addContactButton:{
     position:'absolute',
-    bottom:80,
-    right:50,
+    bottom:20,
+    right:20,
   }
 })
 
