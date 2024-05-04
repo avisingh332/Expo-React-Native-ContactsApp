@@ -1,75 +1,35 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, {  useCallback, useEffect, useState } from 'react'
 import { View, Text, Button, TextInput,StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { FontAwesome6 } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
-import { connectToDb, getContacts } from '../db/db';
+import { connectToDb, createTables, getContacts, listTables } from '../db/db';
+import * as SQLite from 'expo-sqlite'; 
+import { useFocusEffect } from '@react-navigation/native';
 
-const HomeScreen = ({navigation}) => {
-  // const contactList = [
-  //   {
-  //     name:'Aviansh',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'Mohan',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'Sohan',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'Rajesh',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'Sita',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'gita',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'Govind',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'Sohan',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'Rajesh',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'Sita',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'gita',
-  //     PhoneNumber:'',
-  //   },
-  //   {
-  //     name:'Govind',
-  //     PhoneNumber:'',
-  //   }
-  // ]
+const HomeScreen = ({navigation, route}) => {
+  console.log({route});
+
   const [contactList, setContactList] = useState([]);
-
-  const loadData = useCallback(async ()=>{
-    const db = await connectToDb();
-    var res: any[] = null;
-    res= await getContacts(db);
-    setContactList(res);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  
+  const loadData = async()=>{
+    await createTables();
+    let res = await getContacts();
+    // console.log("Result in UseEffect Load Data function......")
     console.log(res);
-  },[]);
-
-  useEffect(()=>{
-    loadData();
-    console.log(contactList);
-  },[loadData]);
-  const [selectedIndices, setSelectedIndices] = useState(new Set());
+    setContactList(res);
+    setIsDataLoaded(true);
+  }
+  useFocusEffect(()=>{
+    if (route.params?.refresh !=null || isDataLoaded==false)  {
+      setIsDataLoaded(true);
+      loadData();
+    }
+  });
+  // useEffect(()=>{
+  //   console.log("UseEffect of Home Screen.............")
+  //   loadData();
+  // },[isDataLoaded])
 
   return (
     <View style={styles.container}>
@@ -97,12 +57,8 @@ const HomeScreen = ({navigation}) => {
                 contactList.map((item,index)=>{
                   return (
                     <TouchableOpacity key={index} style={[styles.row]}
-                    onLongPress={()=>{
-                      // setSelectedIndices([...selectedIndices,index]);
-                      const newSet = new Set(selectedIndices);
-                      newSet.has(index)?newSet.delete(index):newSet.add(index);
-                      setSelectedIndices(newSet);
-                    }}>
+                    onPress={()=>{navigation.navigate('Details', {id:item.id})}}
+                    >
                       <FontAwesome6 name="face-grin-stars" size={24} color="black" />
                       <Text style={{marginStart:10, alignItems:'center'}}>{item.Name}</Text>
                       <AntDesign name="rightcircleo" size={24} color="black" />
@@ -118,7 +74,7 @@ const HomeScreen = ({navigation}) => {
         onPress={()=>{navigation.navigate('AddContact')}}
         >
           <AntDesign name="pluscircle" size={40} color="black"/>
-          <Text> Add New Contact </Text>
+          {/* <Text> Add New Contact </Text> */}
         </TouchableOpacity>
     </View>
   )

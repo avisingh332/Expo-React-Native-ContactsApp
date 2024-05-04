@@ -9,6 +9,7 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
+  
   return (
     <Tab.Navigator
       screenOptions={({route})=>getScreenOptions(route)}
@@ -39,7 +40,7 @@ const getTabBarIcon =(focused,route)=>{
 
 const getTabBarStyle = (route)=>{
   const routeName = getFocusedRouteNameFromRoute(route);
-  console.log("Route name is: " , routeName);
+  // console.log("Route name is: " , routeName);
   if(routeName=='Home'){
     return {display:'flex'}
   }

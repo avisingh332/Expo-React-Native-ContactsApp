@@ -5,23 +5,12 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
 import { addContact, connectToDb, createTables, dropTable, getColumns, getContacts, listTables } from '../db/db';
 
-const AddContact = () => {
-
-  const [db, setDb]= useState(null);
-
-  const loadData = useCallback( async()=>{
-    let dbObj = await connectToDb();
-    setDb(dbObj);
-  },[]);
-
-  useEffect(()=>{
-    loadData()
-  },[loadData]);
+const AddContact = ({navigation}) => {
   
   const[inputForm, setInputForm] =useState({
     name:'',
     phoneNumber:'', 
-    email:'',
+    email:'' ,
   });
 
   const handleChange = (field:string, value:string) =>{
@@ -30,27 +19,34 @@ const AddContact = () => {
       [field]:value
     })
   }
+  // const addData = async()=>{
+  // }
+
   const handleSubmit = async () =>{
     
-    // await listTables(db);
-    // await createTables(db);
-    // await getColumns(db);
-    // const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    // if(inputForm.email==''|| !emailRegex.test(inputForm.email) ||inputForm.name==''|| inputForm.phoneNumber==''){
-    //   Alert.alert("Input Correct values");
-    //   return;
-    // }
-    // await listTables(db);
-    // await addContact(db,inputForm);
-    // setInputForm({
-    //   name:'',
-    //   phoneNumber:'', 
-    //   email:''
-    // })
+    console.log(inputForm);
+
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if(inputForm.email==''|| !emailRegex.test(inputForm.email) ||inputForm.name==''|| inputForm.phoneNumber==''){
+      Alert.alert("Input Correct values");
+      return;
+    }
+
+    await addContact(inputForm);
+    
+    setInputForm({
+      name:'',
+      phoneNumber:'', 
+      email:''
+    })
+    console.log("Now Navigating");
+    navigation.navigate('Home',{refresh:true})
     // await getColumns(db);
     // listTables(db);
-    // await getContacts(db);
+    // navigation.navigate('Home');
+    // await getContacts();
   }
+
   return (
     <ScrollView>
     <View style={{marginTop:20, padding:20,flex:1}}>
@@ -60,9 +56,6 @@ const AddContact = () => {
           <Image resizeMode='contain' style={styles.addImageIcon}  source={require("../assets/add-photo-icon.png")}></Image>
         </View>
         <Text>Add Picture</Text>
-        {/* <View style ={[styles.imageContainer,{backgroundColor:"green"}]}>
-          <Image resizeMode='contain' style={styles.addImageIcon} source={require("../assets/add-photo-icon.png")}></Image>
-        </View> */}
       </View>
       <View>
          {/* Contact Name */}

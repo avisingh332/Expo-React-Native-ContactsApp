@@ -11,7 +11,7 @@ export default function HomeStackNavigator(){
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Home" options={{headerShown:false}} component={HomeScreen} />
-      <HomeStack.Screen name="Favorite" component={FavoriteScreen} />
+      {/* <HomeStack.Screen name="Favorite" component={FavoriteScreen} /> */}
       <HomeStack.Screen name="Details" component ={DetailsScreen}/>
       <HomeStack.Screen name="Search" component ={SearchScreen}/>
       <HomeStack.Screen name="AddContact" component={AddContact}/>
