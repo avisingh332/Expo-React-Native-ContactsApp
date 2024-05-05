@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import HomeStackNavigator from './HomeStackNavigator';
-import FavoriteStackNavigator from './FavoriteStackNavigator';
+
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import HomeTabNavigator from './HomeTabNavigator';
+import FavoriteTabNavigator from './FavoriteTabNavigator';
 
 
 const Tab = createBottomTabNavigator();
@@ -14,8 +15,8 @@ export default function TabNavigator() {
     <Tab.Navigator
       screenOptions={({route})=>getScreenOptions(route)}
     >
-      <Tab.Screen name="HomeTab" component={HomeStackNavigator}/>
-      <Tab.Screen name="FavoriteTab" component={FavoriteStackNavigator} />
+      <Tab.Screen name="HomeTab" component={HomeTabNavigator}/>
+      <Tab.Screen name="FavoriteTab" component={FavoriteTabNavigator} />
     </Tab.Navigator>
   );
 }
@@ -25,7 +26,7 @@ const getScreenOptions = (route)=>{
   
   return {
     tabBarIcon:({focused})=>getTabBarIcon(focused,route),
-    tabBarStyle: getTabBarStyle(route), 
+    // tabBarStyle: getTabBarStyle(route), 
     tabBarActiveTintColor: 'blue',
     tabBarInactiveTintColor: 'gray',
     headerShown:false,

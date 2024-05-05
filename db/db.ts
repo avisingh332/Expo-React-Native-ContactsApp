@@ -111,7 +111,7 @@ export const addContact = async (values) => {
         const db= DatabaseInstance.getInstance();
         
         await db.transactionAsync(async(tx)=>{
-            await tx.executeSqlAsync(query, [values.email,values.name,values.phoneNumber]);
+            const result = await tx.executeSqlAsync(query, [values.email,values.name,values.phoneNumber]);
             // console.log({result});
         });
     

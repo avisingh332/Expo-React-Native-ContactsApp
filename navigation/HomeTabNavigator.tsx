@@ -7,13 +7,13 @@ import AddContact from '../screens/AddContact';
 
 const HomeStack = createNativeStackNavigator();
 
-export default function HomeStackNavigator(){
+export default function HomeTabNavigator(){
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Home" options={{headerShown:false}} component={HomeScreen} />
-      <HomeStack.Screen name="Details" component ={DetailsScreen} options={{
+      {/* <HomeStack.Screen name="Details" component ={DetailsScreen} options={{
         title:''
-      }} />
+      }} /> */}
       <HomeStack.Screen name="Search" component ={SearchScreen}/>
       <HomeStack.Screen name="AddContact" component={AddContact}/>
     </HomeStack.Navigator>

@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const FavoriteStack = createNativeStackNavigator();
 
-export default function FavoriteStackNavigator() {
+export default function FavoriteTabNavigator() {
   return (
     <FavoriteStack.Navigator>
       <FavoriteStack.Screen name="Favorite" component={FavoriteScreen} />
