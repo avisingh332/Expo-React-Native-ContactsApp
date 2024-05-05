@@ -3,6 +3,7 @@ import FavoriteScreen from '../screens/FavoriteScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const FavoriteStack = createNativeStackNavigator();
+
 export default function FavoriteStackNavigator() {
   return (
     <FavoriteStack.Navigator>

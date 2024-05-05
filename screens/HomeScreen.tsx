@@ -1,35 +1,30 @@
 import React, {  useCallback, useEffect, useState } from 'react'
 import { View, Text, Button, TextInput,StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
-import { FontAwesome6 } from '@expo/vector-icons';
+
 import { AntDesign } from '@expo/vector-icons';
-import { connectToDb, createTables, getContacts, listTables } from '../db/db';
-import * as SQLite from 'expo-sqlite'; 
-import { useFocusEffect } from '@react-navigation/native';
+import { createTables, dropTable, getContacts } from '../db/db';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { EventRegister } from 'react-native-event-listeners';
+import ContactList from '../components/ContactList';
 
-const HomeScreen = ({navigation, route}) => {
-  console.log({route});
-
+const HomeScreen = ({navigation}) => {
   const [contactList, setContactList] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  
+  const isFocused = useIsFocused();
   const loadData = async()=>{
+    // await dropTable()
     await createTables();
     let res = await getContacts();
-    // console.log("Result in UseEffect Load Data function......")
-    console.log(res);
     setContactList(res);
     setIsDataLoaded(true);
   }
-  useFocusEffect(()=>{
-    if (route.params?.refresh !=null || isDataLoaded==false)  {
-      setIsDataLoaded(true);
+  
+  useEffect(()=>{
+    if(isFocused==true){
+      console.log("Home Screen is Mounted!!!")
       loadData();
     }
-  });
-  // useEffect(()=>{
-  //   console.log("UseEffect of Home Screen.............")
-  //   loadData();
-  // },[isDataLoaded])
+  },[isFocused])
 
   return (
     <View style={styles.container}>
@@ -48,26 +43,7 @@ const HomeScreen = ({navigation, route}) => {
 
         {/* BodySection */}
         <View style={styles.bodySection}>
-          {
-            contactList.length==0 ?
-            <Text style={{fontSize:20, color:'black'}} >Empty List......</Text>
-            :
-            <ScrollView>
-              {
-                contactList.map((item,index)=>{
-                  return (
-                    <TouchableOpacity key={index} style={[styles.row]}
-                    onPress={()=>{navigation.navigate('Details', {id:item.id})}}
-                    >
-                      <FontAwesome6 name="face-grin-stars" size={24} color="black" />
-                      <Text style={{marginStart:10, alignItems:'center'}}>{item.Name}</Text>
-                      <AntDesign name="rightcircleo" size={24} color="black" />
-                    </TouchableOpacity>
-                  )
-                })
-              }
-            </ScrollView>
-          }
+          <ContactList contactList={contactList} navigation={navigation}/>
         </View>
         {/* Addcontact Button */}
         <TouchableOpacity style={styles.addContactButton}

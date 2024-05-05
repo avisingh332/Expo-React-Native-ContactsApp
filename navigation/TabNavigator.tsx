@@ -22,6 +22,7 @@ export default function TabNavigator() {
 
 
 const getScreenOptions = (route)=>{
+  
   return {
     tabBarIcon:({focused})=>getTabBarIcon(focused,route),
     tabBarStyle: getTabBarStyle(route), 
@@ -40,8 +41,13 @@ const getTabBarIcon =(focused,route)=>{
 
 const getTabBarStyle = (route)=>{
   const routeName = getFocusedRouteNameFromRoute(route);
-  // console.log("Route name is: " , routeName);
-  if(routeName=='Home'){
+  // console.log("Route name is: " , {route});
+  // console.log("Focused Route name is: " , routeName);
+  if (!routeName) {
+    // Default behavior: display tab bar if route name is undefined
+    return { display: 'flex' };
+  }
+  if(routeName=='Home' || routeName=='Favorite'){
     return {display:'flex'}
   }
   else return {display:'none'}

@@ -4,7 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
 import { addContact, connectToDb, createTables, dropTable, getColumns, getContacts, listTables } from '../db/db';
-
+import { EventRegister } from 'react-native-event-listeners';
 const AddContact = ({navigation}) => {
   
   const[inputForm, setInputForm] =useState({
@@ -13,18 +13,20 @@ const AddContact = ({navigation}) => {
     email:'' ,
   });
 
+  const fireEvent = ()=>{
+    EventRegister.emitEvent('reloadContacts',"Event Triggered");
+  }
+
   const handleChange = (field:string, value:string) =>{
     setInputForm({
       ...inputForm, 
       [field]:value
     })
   }
-  // const addData = async()=>{
-  // }
 
   const handleSubmit = async () =>{
     
-    console.log(inputForm);
+    // console.log(inputForm);
 
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if(inputForm.email==''|| !emailRegex.test(inputForm.email) ||inputForm.name==''|| inputForm.phoneNumber==''){
@@ -39,13 +41,11 @@ const AddContact = ({navigation}) => {
       phoneNumber:'', 
       email:''
     })
-    console.log("Now Navigating");
-    navigation.navigate('Home',{refresh:true})
-    // await getColumns(db);
-    // listTables(db);
-    // navigation.navigate('Home');
-    // await getContacts();
   }
+
+  useEffect(()=>{
+    console.log("AddContact is Mounted.....")
+  },[]);
 
   return (
     <ScrollView>

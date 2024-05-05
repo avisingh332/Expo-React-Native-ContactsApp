@@ -32,11 +32,9 @@ export const dropTable = async() =>{
     `;
     try{
         const db= await connectToDb();
-        db.transaction(tx=>{
-            tx.executeSql(query,[],
-                (txObj,resultSet) => console.log("Deleted Table Successfully"),
-                (txObj, error) => {console.log(error); return true} ,
-            );
+        await db.transactionAsync(async(tx)=>{
+            await tx.executeSqlAsync(query,[]);
+            console.log("Deleted Table Successfully")
         });
     }
     catch(error){
@@ -51,7 +49,8 @@ export const createTables = async () => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             Name TEXT,
             PhoneNumber TEXT,
-            Email TEXT
+            Email TEXT,
+            Favorite INTEGER DEFAULT 0
         );
     `
     try{
@@ -62,7 +61,7 @@ export const createTables = async () => {
             await tx.executeSqlAsync(contactQuery, []);
             console.log("Table Created successfully");
         })
-        await listTables();
+        // await listTables();
     //     db.transaction(tx=>{
     //     tx.executeSql(contactQuery,[],
     //         (txObj,resultSet)=> {console.log("Created Table Successfully")},
@@ -102,8 +101,6 @@ export const getContacts = (): Promise<any[]> => {
 }
 
 export const addContact = async (values) => {
-    console.log("Values are:");
-    console.log(values);
     // Insert query with placeholders for dynamic values
     const query = `
         INSERT INTO contacts(Email, Name, PhoneNumber) 
@@ -112,10 +109,10 @@ export const addContact = async (values) => {
     try{
         // Execute the transaction to insert the new contact
         const db= DatabaseInstance.getInstance();
-        console.log({db});
+        
         await db.transactionAsync(async(tx)=>{
-            const result = await tx.executeSqlAsync(query, [values.email,values.name,values.phoneNumber]);
-            console.log({result});
+            await tx.executeSqlAsync(query, [values.email,values.name,values.phoneNumber]);
+            // console.log({result});
         });
     
    }catch(error){
