@@ -3,6 +3,7 @@ import { View , Text} from 'react-native'
 import { DatabaseInstance } from '../db/db'
 import { SQLiteDatabase } from 'expo-sqlite';
 import ContactList from '../components/ContactList';
+import { useIsFocused } from '@react-navigation/native';
 
 const FavoriteScreen = ({navigation}) => {
   const [favoriteContacts, setFavoriteContacts] = useState([]);
@@ -18,10 +19,12 @@ const FavoriteScreen = ({navigation}) => {
       setFavoriteContacts(result.rows);
     })
   }
-
+  const isFocus = useIsFocused();
   useEffect(()=>{
-    fetchFavoriteContact();
-  },[])
+    if(isFocus==true){
+      fetchFavoriteContact();
+    }
+  },[isFocus])
 
   return (
     <View style={{padding:20}} >
