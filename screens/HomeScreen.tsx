@@ -2,7 +2,7 @@ import React, {  useCallback, useEffect, useState } from 'react'
 import { View, Text, Button, TextInput,StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 
 import { AntDesign } from '@expo/vector-icons';
-import { createTables, dropTable, getContacts } from '../db/db';
+import { createTables, dropTable, getColumns, getContacts } from '../db/db';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { EventRegister } from 'react-native-event-listeners';
 import ContactList from '../components/ContactList';
@@ -11,14 +11,13 @@ const HomeScreen = ({navigation}) => {
   const [contactList, setContactList] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const isFocused = useIsFocused();
+
   const loadData = async()=>{
-    // await dropTable()
     await createTables();
     let res = await getContacts();
     setContactList(res);
     setIsDataLoaded(true);
   }
-  
   useEffect(()=>{
     if(isFocused==true){
       console.log("Home Screen is Mounted!!!")

@@ -1,9 +1,8 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
-import DetailsScreen from '../screens/DetailsScreen';
 import SearchScreen from '../screens/SearchScreen';
-import AddContact from '../screens/AddContact';
+import UpsertContactScreen from '../screens/UpsertContactScreen';
 
 const HomeStack = createNativeStackNavigator();
 
@@ -15,7 +14,7 @@ export default function HomeTabNavigator(){
         title:''
       }} /> */}
       <HomeStack.Screen name="Search" component ={SearchScreen}/>
-      <HomeStack.Screen name="AddContact" component={AddContact}/>
+      <HomeStack.Screen name="AddContact" component={UpsertContactScreen}/>
     </HomeStack.Navigator>
   );
 }

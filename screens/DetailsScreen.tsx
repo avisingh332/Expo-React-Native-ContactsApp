@@ -2,22 +2,24 @@ import React, { useEffect, useState } from 'react'
 import { View, Text, Image, StyleSheet, Button, TouchableOpacity } from 'react-native'
 import { DatabaseInstance } from '../db/db';
 import { SQLiteDatabase } from 'expo-sqlite';
-import { EventRegister } from 'react-native-event-listeners';
 import { Feather } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
+import { deleteImage } from '../utility/SaveImageLocally';
 
 
-const HeaderRightComponent = ({handleDelete, handleFavorite, favorite})=>{ 
+const HeaderRightComponent = ({handleDelete, handleFavorite,handleEdit, favorite})=>{ 
   console.log("Value of Favorite is : ", favorite);
   return (
     <View style={{display:'flex', flexDirection:'row', justifyContent:'space-evenly'}}>
       <TouchableOpacity onPress={()=>{handleFavorite()}}>
         <AntDesign name={(favorite==0)?'staro':'star'} size={30} color="black" />
       </TouchableOpacity>
-      <MaterialCommunityIcons style={{marginStart:5}} name="pencil" size={30} color="black" />
+      <TouchableOpacity onPress={()=>handleEdit()}>
+        <MaterialCommunityIcons style={{marginStart:5}} name="pencil" size={30} color="black" />
+      </TouchableOpacity>
       <TouchableOpacity onPress={()=>{handleDelete()}}>
         <Ionicons name="trash" style={{marginStart:5}} size={30} color="black" />
       </TouchableOpacity>
@@ -34,6 +36,7 @@ const DetailsScreen = ({navigation, route}) => {
     Email:'',
     PhoneNumber:'',
     Favorite:0,
+    ImageUri:null,
   });
   // const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -54,25 +57,26 @@ const DetailsScreen = ({navigation, route}) => {
     loadData();
   }
 
+async function handleEdit(){
+    console.log("Details Send From Details are :", details);
+    navigation.navigate('AddContact',{details:details})
+}
+
   useEffect(()=>{
     console.log("DetailsScreen is Mounted...");
-    // loadData();
-    renderHeaderComp();
+    loadData();
+    // renderHeaderComp();
   },[]);
 
   useEffect(()=>{
     navigation.setOptions({
       headerRight:()=><HeaderRightComponent handleDelete={handleDelete} 
         handleFavorite={handleFavorite}
+        handleEdit={handleEdit}
         favorite={details.Favorite}/>
     })
   },[details])
 
-  async function renderHeaderComp(){
-    await loadData();
-    console.log("After Loading Data");
-    console.log(details);
-  }
   async function loadData(){
     const query = `SELECT * FROM contacts WHERE id=?`;
     const db:SQLiteDatabase =DatabaseInstance.getInstance();
@@ -82,7 +86,9 @@ const DetailsScreen = ({navigation, route}) => {
       PhoneNumber: '',
       Email: '',
       Favorite: 0,
+      ImageUri:'',
     };
+
     await db.transactionAsync(async(tx)=>{
       const result = await tx.executeSqlAsync(query, [details.id]);
       console.log("Settings Details");
@@ -92,10 +98,11 @@ const DetailsScreen = ({navigation, route}) => {
         Name:result.rows[0].Name,
         PhoneNumber: result.rows[0].PhoneNumber,
         Email: result.rows[0].Email,
-        Favorite: result.rows[0].Favorite
+        Favorite: result.rows[0].Favorite,
+        ImageUri:result.rows[0].ImageUri,
       }
       setDetails(obj);
-      console.log(details);
+      // console.log(details);
     })
   }
 
@@ -106,7 +113,8 @@ const DetailsScreen = ({navigation, route}) => {
     console.log("Id is ", details.id);
     await db.transactionAsync(async(tx)=>{
        await tx.executeSqlAsync("DELETE FROM contacts WHERE id=?", [details.id]);
-       console.log("Deleted Successfully!!!");
+       console.log("Contact Deleted from Database!!");
+       await deleteImage(details.ImageUri);
        navigation.navigate('Home');
     });
   }
@@ -114,8 +122,8 @@ const DetailsScreen = ({navigation, route}) => {
   return (
     <View  style={{marginTop:15, padding:20,flex:1}} >
       <View style={{justifyContent:'center',alignItems:'center',display:'flex'}}>
-        <View style={{backgroundColor:'gray',borderRadius:999,padding:20}}>
-          <Image resizeMode='contain' style={styles.imageStyle}  source={require("../assets/add-photo-icon.png")}></Image>
+        <View style={styles.imageContainer}>
+          <Image resizeMode='contain' style={styles.image}  source={{uri:details.ImageUri}}></Image>
         </View>
         <View style={{marginTop:10}}> 
           <Text style={{fontSize:25}}>{details.Name}</Text>
@@ -137,18 +145,27 @@ const DetailsScreen = ({navigation, route}) => {
           <Text>{details.Email}</Text>
         </View>
       </View>
-      <View style={{marginTop:10}}>
-        <View style={{marginVertical:10}}><Button title ='Delete' color={'red'} onPress={()=>handleDelete()}/></View>
-        <View style={{marginVertical:10}}><Button title ='Update' /></View>
-      </View>
     </View>
   )
 }
 const styles = StyleSheet.create({
-  imageStyle:{
-    height:180,
-    width:180,
+  imageContainer:{
+    // backgroundColor:'green',
+    height:200, 
+    width:200,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:'gray',
+    borderRadius:999,
+    padding:20,
+    overflow:'hidden'
   },
+ 
+  image:{
+    height:'170%',
+    width:'170%',
+  },
+  
   iconTrayWrapper:{
     display:'flex',flexDirection:'row', justifyContent:'space-between', marginVertical:30,
     marginHorizontal:20

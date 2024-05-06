@@ -14,30 +14,30 @@ export const DatabaseInstance = (() => {
     };
 })();
 
-export const connectToDb = () :SQLite.SQLiteDatabase =>{
-    try{
-        const db =  SQLite.openDatabase("contactAppDB.db");
+export const connectToDb = (): SQLite.SQLiteDatabase => {
+    try {
+        const db = SQLite.openDatabase("contactAppDB.db");
         return db;
-    }catch(error){
+    } catch (error) {
         console.log("Error Connecting to Database......");
         console.log(error);
         throw Error("Failed to connect to database")
     }
 }
 
-export const dropTable = async() =>{
-   
-    const query =`
+export const dropTable = async () => {
+
+    const query = `
     DROP TABLE IF EXISTS contacts;
     `;
-    try{
-        const db= await connectToDb();
-        await db.transactionAsync(async(tx)=>{
-            await tx.executeSqlAsync(query,[]);
+    try {
+        const db = await connectToDb();
+        await db.transactionAsync(async (tx) => {
+            await tx.executeSqlAsync(query, []);
             console.log("Deleted Table Successfully")
         });
     }
-    catch(error){
+    catch (error) {
         console.log(error);
     }
 }
@@ -50,83 +50,119 @@ export const createTables = async () => {
             Name TEXT,
             PhoneNumber TEXT,
             Email TEXT,
-            Favorite INTEGER DEFAULT 0
+            Favorite INTEGER DEFAULT 0,
+            ImageUri TEXT
         );
     `
-    try{
-        const db= DatabaseInstance.getInstance();
+    try {
+        const db = DatabaseInstance.getInstance();
         // console.log({db});
         console.log("Into create table ");
-        await db.transactionAsync(async(tx)=>{
+        await db.transactionAsync(async (tx) => {
             await tx.executeSqlAsync(contactQuery, []);
             console.log("Table Created successfully");
         })
         // await listTables();
-    //     db.transaction(tx=>{
-    //     tx.executeSql(contactQuery,[],
-    //         (txObj,resultSet)=> {console.log("Created Table Successfully")},
-    //         (txObj,error)=> {throw error}
-    //     )
-    //    });
-       
-    }catch(error){
+        //     db.transaction(tx=>{
+        //     tx.executeSql(contactQuery,[],
+        //         (txObj,resultSet)=> {console.log("Created Table Successfully")},
+        //         (txObj,error)=> {throw error}
+        //     )
+        //    });
+
+    } catch (error) {
         console.error(error)
         throw Error(`Failed to create tables`)
     }
 }
 
 export const getContacts = (): Promise<any[]> => {
-    try {        
-        return new Promise((resolve, reject)=>{
-            const db= DatabaseInstance.getInstance();
-            db.transaction(tx=>{
-                tx.executeSql('Select * from contacts', [], 
-                    (txObj, res)=>{
+    try {
+        return new Promise((resolve, reject) => {
+            const db = DatabaseInstance.getInstance();
+            db.transaction(tx => {
+                tx.executeSql('Select * from contacts', [],
+                    (txObj, res) => {
                         // console.log("Result in the getContacts Meathod......");
                         // console.log(res.rows._array);
                         resolve(res.rows._array);
 
                     },
-                    (txObj,error)=>{
+                    (txObj, error) => {
                         reject(error);
                     }
                 )
             })
         })
-       
+
     } catch (error) {
         console.error(error)
         throw Error("Failed to get Contacts from database")
-    }  
+    }
 }
 
-export const addContact = async (values) => {
+export const upsertContact = async (values) => {
     // Insert query with placeholders for dynamic values
-    const query = `
-        INSERT INTO contacts(Email, Name, PhoneNumber) 
-        VALUES (?, ?, ?)
+    console.log(values);
+    const insertQuery = `
+        INSERT INTO contacts(Name, Email, PhoneNumber, Favorite, ImageUri) 
+        VALUES (?, ?, ?,?,?)
     `;
-    try{
+    const updateQuery = `
+        UPDATE contacts
+        SET
+        Name =?,
+        Email =?,
+        PhoneNumber =?,
+        Favorite =?,
+        ImageUri =?
+    `;
+    try {
         // Execute the transaction to insert the new contact
-        const db= DatabaseInstance.getInstance();
-        
-        await db.transactionAsync(async(tx)=>{
-            const result = await tx.executeSqlAsync(query, [values.email,values.name,values.phoneNumber]);
+        const db = DatabaseInstance.getInstance();
+
+        await db.transactionAsync(async (tx) => {
+            const result = await tx.executeSqlAsync(values.isUpdateRequest?updateQuery:insertQuery, 
+                [values.Name, values.Email, values.PhoneNumber,values.Favorite, values.imageUri]);
             // console.log({result});
         });
-    
-   }catch(error){
-    console.log(error);
-    throw Error(`Failed to Add Contact`)
-   }
+
+    } catch (error) {
+        console.log(error);
+        throw Error(`Failed to Add Contact`)
+    }
 };
 
+export async function updateContact(values) {
+    const query = `
+        UPDATE contacts
+        SET
+        Name =?,
+        PhoneNumber =?,
+        Email =?,
+        Favorite =?,
+        ImageUri =?
+    `;
+    try {
+        // Execute the transaction to insert the new contact
+        const db = DatabaseInstance.getInstance();
+
+        await db.transactionAsync(async (tx) => {
+            const result = await tx.executeSqlAsync(query, [values.email, values.name, values.phoneNumber, values.imageUri]);
+            // console.log({result});
+        });
+
+    } catch (error) {
+        console.log(error);
+        throw Error(`Failed to Add Contact`)
+    }
+}
 export const listTables = async () => {
 
     const query = `
       SELECT name FROM sqlite_schema WHERE type = 'table' ORDER BY name
     `;
-  
+
     try {
         // await db.transactionAsync(async(tx)=>{
         //     const resultSet = await tx.executeSqlAsync( query, []);
@@ -134,9 +170,9 @@ export const listTables = async () => {
         //     console.log("Success.....");
         // })
         const db = DatabaseInstance.getInstance();
-        await db.transactionAsync(async(tx)=>{
+        await db.transactionAsync(async (tx) => {
             const result = await tx.executeSqlAsync(
-                query, 
+                query,
                 [],
             );
             console.log(result.rows);
@@ -156,24 +192,24 @@ export const listTables = async () => {
         //     );
         // });
     } catch (error) {
-      console.error("Transaction failed:", error);
+        console.error("Transaction failed:", error);
     }
-  };
+};
 
-export const getColumns = async() =>{
+export const getColumns = async () => {
     const query = `
     SELECT sql FROM sqlite_master
     WHERE tbl_name = 'contacts' AND type = 'table'
     `;
-    try{
+    try {
         const db = await connectToDb()
-        db.transaction(tx=>{
-            tx.executeSql(query,null,
-            (txObj,resultSet)=> console.log(resultSet.rows._array),
-            (txObj,error)=> {console.log(error); return true;}
+        db.transaction(tx => {
+            tx.executeSql(query, null,
+                (txObj, resultSet) => console.log(resultSet.rows._array),
+                (txObj, error) => { console.log(error); return true; }
             )
         })
-    } catch(error){
+    } catch (error) {
         console.log(error);
     }
 }

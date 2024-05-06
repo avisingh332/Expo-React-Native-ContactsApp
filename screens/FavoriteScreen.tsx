@@ -7,10 +7,11 @@ import { useIsFocused } from '@react-navigation/native';
 
 const FavoriteScreen = ({navigation}) => {
   const [favoriteContacts, setFavoriteContacts] = useState([]);
+
   async function fetchFavoriteContact(){
     const db :SQLiteDatabase= DatabaseInstance.getInstance();
     const query = `
-      SELECT id, Name FROM contacts 
+      SELECT id, Name, ImageUri FROM contacts 
       WHERE Favorite=1
     `
     await db.transactionAsync(async(tx)=>{
