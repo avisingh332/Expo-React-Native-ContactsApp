@@ -12,7 +12,6 @@ const ContactList = ({contactList,navigation}) => {
         <ScrollView>
             {
             contactList.map((item,index)=>{
-              {console.log("Item Number:", index,item.ImageUri)}
                 return (
                 <TouchableOpacity key={index} style={[styles.row]}
                 onPress={()=>{navigation.navigate('Details', {id:item.id})}}

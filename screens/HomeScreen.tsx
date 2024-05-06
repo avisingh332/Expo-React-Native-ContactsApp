@@ -1,26 +1,24 @@
-import React, {  useCallback, useEffect, useState } from 'react'
-import { View, Text, Button, TextInput,StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import React, {  useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 
 import { AntDesign } from '@expo/vector-icons';
 import { createTables, dropTable, getColumns, getContacts } from '../db/db';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
-import { EventRegister } from 'react-native-event-listeners';
+import {  useIsFocused } from '@react-navigation/native';
+
 import ContactList from '../components/ContactList';
 
 const HomeScreen = ({navigation}) => {
   const [contactList, setContactList] = useState([]);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const isFocused = useIsFocused();
 
   const loadData = async()=>{
     await createTables();
     let res = await getContacts();
     setContactList(res);
-    setIsDataLoaded(true);
   }
+  
   useEffect(()=>{
     if(isFocused==true){
-      console.log("Home Screen is Mounted!!!")
       loadData();
     }
   },[isFocused])
@@ -46,7 +44,7 @@ const HomeScreen = ({navigation}) => {
         </View>
         {/* Addcontact Button */}
         <TouchableOpacity style={styles.addContactButton}
-        onPress={()=>{navigation.navigate('AddContact')}}
+        onPress={()=>{navigation.navigate('UpsertContact')}}
         >
           <AntDesign name="pluscircle" size={40} color="black"/>
           {/* <Text> Add New Contact </Text> */}

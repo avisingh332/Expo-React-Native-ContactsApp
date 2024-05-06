@@ -14,7 +14,7 @@ export default function HomeTabNavigator(){
         title:''
       }} /> */}
       <HomeStack.Screen name="Search" component ={SearchScreen}/>
-      <HomeStack.Screen name="AddContact" component={UpsertContactScreen}/>
+      <HomeStack.Screen name="UpsertContact" component={UpsertContactScreen}/>
     </HomeStack.Navigator>
   );
 }

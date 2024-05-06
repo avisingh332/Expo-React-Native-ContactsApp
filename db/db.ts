@@ -56,8 +56,6 @@ export const createTables = async () => {
     `
     try {
         const db = DatabaseInstance.getInstance();
-        // console.log({db});
-        console.log("Into create table ");
         await db.transactionAsync(async (tx) => {
             await tx.executeSqlAsync(contactQuery, []);
             console.log("Table Created successfully");
@@ -104,6 +102,7 @@ export const getContacts = (): Promise<any[]> => {
 export const upsertContact = async (values) => {
     // Insert query with placeholders for dynamic values
     console.log(values);
+
     const insertQuery = `
         INSERT INTO contacts(Name, Email, PhoneNumber, Favorite, ImageUri) 
         VALUES (?, ?, ?,?,?)
@@ -116,6 +115,7 @@ export const upsertContact = async (values) => {
         PhoneNumber =?,
         Favorite =?,
         ImageUri =?
+        WHERE id =?
     `;
     try {
         // Execute the transaction to insert the new contact
@@ -123,7 +123,7 @@ export const upsertContact = async (values) => {
 
         await db.transactionAsync(async (tx) => {
             const result = await tx.executeSqlAsync(values.isUpdateRequest?updateQuery:insertQuery, 
-                [values.Name, values.Email, values.PhoneNumber,values.Favorite, values.imageUri]);
+                [values.Name, values.Email, values.PhoneNumber,values.Favorite, values.imageUri,values.id]);
             // console.log({result});
         });
 
