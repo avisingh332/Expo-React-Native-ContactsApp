@@ -12,6 +12,7 @@ const HomeScreen = ({navigation}) => {
   const isFocused = useIsFocused();
 
   const loadData = async()=>{
+    // await dropTable();
     await createTables();
     let res = await getContacts();
     setContactList(res);

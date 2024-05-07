@@ -17,10 +17,10 @@ const ContactList = ({contactList,navigation}) => {
                 >
                     {/* <FontAwesome6 name="face-grin-stars" size={24} color="black" /> */}
                     <View style={styles.imageContainer}>
-                      <Image resizeMode='contain' source={{uri:item.ImageUri}} style={styles.image}/>
+                      <Image resizeMode='contain' source={{uri:item.imageUri}} style={styles.image}/>
                     </View>
                     <View style={{flex:1, flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                      <Text style={{marginStart:20, alignItems:'center',fontSize:20}}>{item.Name}</Text>
+                      <Text style={{marginStart:20, alignItems:'center',fontSize:20}}>{item.name}</Text>
                       <AntDesign name="rightcircleo" size={30} color="black" />
                     </View>
                 </TouchableOpacity>

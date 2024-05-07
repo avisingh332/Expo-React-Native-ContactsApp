@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import { deleteImage } from '../utility/SaveImageLocally';
 
 // Singleton pattern to get a single instance of the database
 export const DatabaseInstance = (() => {
@@ -47,11 +48,11 @@ export const createTables = async () => {
     const contactQuery = `
         CREATE TABLE IF NOT EXISTS contacts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            Name TEXT,
-            PhoneNumber TEXT,
-            Email TEXT,
-            Favorite INTEGER DEFAULT 0,
-            ImageUri TEXT
+            name TEXT,
+            phoneNumber TEXT,
+            email TEXT,
+            favorite INTEGER DEFAULT 0,
+            imageUri TEXT
         );
     `
     try {
@@ -60,13 +61,6 @@ export const createTables = async () => {
             await tx.executeSqlAsync(contactQuery, []);
             console.log("Table Created successfully");
         })
-        // await listTables();
-        //     db.transaction(tx=>{
-        //     tx.executeSql(contactQuery,[],
-        //         (txObj,resultSet)=> {console.log("Created Table Successfully")},
-        //         (txObj,error)=> {throw error}
-        //     )
-        //    });
 
     } catch (error) {
         console.error(error)
@@ -104,16 +98,16 @@ export const upsertContact = async (values) => {
     console.log(values);
 
     const insertQuery = `
-        INSERT INTO contacts(Name, Email, PhoneNumber, Favorite, ImageUri) 
+        INSERT INTO contacts(name, email, phoneNumber, favorite, imageUri) 
         VALUES (?, ?, ?,?,?)
     `;
     const updateQuery = `
         UPDATE contacts
         SET
-        Name =?,
-        Email =?,
-        PhoneNumber =?,
-        Favorite =?,
+        name =?,
+        email =?,
+        phoneNumber =?,
+        favorite =?,
         ImageUri =?
         WHERE id =?
     `;
@@ -123,7 +117,7 @@ export const upsertContact = async (values) => {
 
         await db.transactionAsync(async (tx) => {
             const result = await tx.executeSqlAsync(values.isUpdateRequest?updateQuery:insertQuery, 
-                [values.Name, values.Email, values.PhoneNumber,values.Favorite, values.imageUri,values.id]);
+                [values.name, values.email, values.phoneNumber,values.favorite, values.imageUri,values.id]);
             // console.log({result});
         });
 
@@ -137,10 +131,10 @@ export async function updateContact(values) {
     const query = `
         UPDATE contacts
         SET
-        Name =?,
-        PhoneNumber =?,
-        Email =?,
-        Favorite =?,
+        name =?,
+        phoneNumber =?,
+        email =?,
+        favorite =?,
         ImageUri =?
     `;
     try {

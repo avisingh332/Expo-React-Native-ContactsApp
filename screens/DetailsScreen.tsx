@@ -11,7 +11,6 @@ import { deleteImage } from '../utility/SaveImageLocally';
 
 
 const HeaderRightComponent = ({ handleDelete, handleFavorite, handleEdit, favorite }) => {
-  // console.log("Value of Favorite is : ", favorite);
   return (
     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
       <TouchableOpacity onPress={() => { handleFavorite() }}>
@@ -30,22 +29,22 @@ const HeaderRightComponent = ({ handleDelete, handleFavorite, handleEdit, favori
 const DetailsScreen = ({ navigation, route }) => {
   const [details, setDetails] = useState({
     id: route.params?.id,
-    Name: '',
-    Email: '',
-    PhoneNumber: '',
-    Favorite: 0,
-    ImageUri: null,
+    name: '',
+    email: '',
+    phoneNumber: '',
+    favorite: 0,
+    imageUri: null,
   });
   // const [dataLoaded, setDataLoaded] = useState(false);
 
   async function handleFavorite() {
     const query = `
       UPDATE CONTACTS
-      SET  Favorite = ?
+      SET  favorite = ?
       WHERE id= ?
     `;
-    console.log("Details Before Favorite:", details);
-    const favorite = details.Favorite == 1 ? 0 : 1;
+    console.log("Details Before favorite:", details);
+    const favorite = details.favorite == 1 ? 0 : 1;
     console.log("Value of Favorite to be Setted: ", favorite);
     const db: SQLiteDatabase = DatabaseInstance.getInstance();
     await db.transactionAsync(async (tx) => {
@@ -68,7 +67,7 @@ const DetailsScreen = ({ navigation, route }) => {
       headerRight: () => <HeaderRightComponent handleDelete={handleDelete}
         handleFavorite={handleFavorite}
         handleEdit={handleEdit}
-        favorite={details.Favorite} />
+        favorite={details.favorite} />
     })
   }, [details])
 
@@ -77,11 +76,11 @@ const DetailsScreen = ({ navigation, route }) => {
     const db: SQLiteDatabase = DatabaseInstance.getInstance();
     let obj = {
       id: '',
-      Name: '',
-      PhoneNumber: '',
-      Email: '',
-      Favorite: 0,
-      ImageUri: '',
+      name: '',
+      phoneNumber: '',
+      email: '',
+      favorite: 0,
+      imageUri: '',
     };
 
     await db.transactionAsync(async (tx) => {
@@ -90,11 +89,11 @@ const DetailsScreen = ({ navigation, route }) => {
       // console.log(result.rows[0]);
       obj = {
         id: result.rows[0].id,
-        Name: result.rows[0].Name,
-        PhoneNumber: result.rows[0].PhoneNumber,
-        Email: result.rows[0].Email,
-        Favorite: result.rows[0].Favorite,
-        ImageUri: result.rows[0].ImageUri,
+        name: result.rows[0].name,
+        phoneNumber: result.rows[0].phoneNumber,
+        email: result.rows[0].email,
+        favorite: result.rows[0].favorite,
+        imageUri: result.rows[0].imageUri,
       }
       setDetails(obj);
       // console.log(details);
@@ -112,7 +111,7 @@ const DetailsScreen = ({ navigation, route }) => {
         // console.log("Image Removed Successfully")
         // navigation.navigate('Home');
       });
-      await deleteImage(details.ImageUri);
+      await deleteImage(details.imageUri);
       Alert.alert("Deleted Successfully!!!");
       navigation.navigate('Home');
     } catch(error){
@@ -124,10 +123,10 @@ const DetailsScreen = ({ navigation, route }) => {
     <View style={{ marginTop: 15, padding: 20, flex: 1 }} >
       <View style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
         <View style={styles.imageContainer}>
-          <Image resizeMode='contain' style={styles.image} source={{ uri: details.ImageUri }}></Image>
+          <Image resizeMode='contain' style={styles.image} source={{ uri: details.imageUri }}></Image>
         </View>
         <View style={{ marginTop: 10 }}>
-          <Text style={{ fontSize: 25 }}>{details.Name}</Text>
+          <Text style={{ fontSize: 25 }}>{details.name}</Text>
         </View>
       </View>
 
@@ -139,11 +138,11 @@ const DetailsScreen = ({ navigation, route }) => {
       <View style={styles.detailsWrapper}>
         <View style={styles.textWrapper}>
           <Text style={{ fontWeight: 'bold' }}>Phone Number: </Text>
-          <Text>{details.PhoneNumber}</Text>
+          <Text>{details.phoneNumber}</Text>
         </View>
         <View style={styles.textWrapper}>
           <Text style={{ fontWeight: 'bold' }}>Email: </Text>
-          <Text>{details.Email}</Text>
+          <Text>{details.email}</Text>
         </View>
       </View>
     </View>

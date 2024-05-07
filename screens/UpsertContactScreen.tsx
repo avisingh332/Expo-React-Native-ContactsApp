@@ -6,17 +6,18 @@ import { Fontisto } from '@expo/vector-icons';
 import { upsertContact } from '../db/db';
 import { EventRegister } from 'react-native-event-listeners';
 import * as ImagePicker from 'expo-image-picker';
-import { storeImageLocally } from '../utility/SaveImageLocally';
+import { deleteImage, storeImageLocally } from '../utility/SaveImageLocally';
 
 const UpsertContactScreen = ({ navigation, route }) => {
   const [isUpdateRequest, setIsUpdateRequest] = useState(false);
   const [isImageSet, setIsImageSet] = useState(false);
   const [inputForm, setInputForm] = useState({
     id:null,
-    Name: '',
-    PhoneNumber: '',
-    Email: '',
-    Favorite: 0,
+    name: '',
+    phoneNumber: '',
+    email: '',
+    favorite: 0,
+    imageUri:'',
   });
 
   const fireEvent = () => {
@@ -32,25 +33,23 @@ const UpsertContactScreen = ({ navigation, route }) => {
 
   const handleSubmit = async () => {
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (inputForm.Email == '' || !emailRegex.test(inputForm.Email) || inputForm.Name == '' || inputForm.PhoneNumber == ''
+    if (inputForm.email == '' || !emailRegex.test(inputForm.email) || inputForm.name == '' || inputForm.phoneNumber == ''
       || image == null) {
       Alert.alert("Input Correct values");
-      navigation.navigate('Home');
+      // navigation.navigate('Home');
       return;
     }
     let imageLocalUri;
+    console.log("is Image Set:", isImageSet);
     if (isImageSet) {
+      if(isUpdateRequest){
+        await deleteImage(inputForm.imageUri);
+      }
       imageLocalUri = await storeImageLocally(image);
       console.log('Image saved in memory');
     }
     await upsertContact({ ...inputForm, imageUri: isImageSet ? imageLocalUri : image, isUpdateRequest: isUpdateRequest })
     Alert.alert("Updated Successfully!!!");
-    // setInputForm({
-    //   Name: '',
-    //   PhoneNumber: '',
-    //   Email: '',
-    //   Favorite: 0,
-    // })
     navigation.goBack();
   }
 
@@ -80,7 +79,6 @@ const UpsertContactScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     
-    
     if (route.params?.details != null) {
 
       const details = route.params?.details;
@@ -88,12 +86,13 @@ const UpsertContactScreen = ({ navigation, route }) => {
       setIsUpdateRequest(true);
       setInputForm({
         id: details.id,
-        Name: details.Name,
-        PhoneNumber: details.PhoneNumber,
-        Email: details.Email,
-        Favorite: details.Favorite,
+        name: details.name,
+        phoneNumber: details.phoneNumber,
+        email: details.email,
+        favorite: details.favorite,
+        imageUri:details.imageUri
       });
-      setImage(details.ImageUri)
+      setImage(details.imageUri)
       navigation.setOptions({
         title: 'Update Contact'
       })
@@ -117,8 +116,8 @@ const UpsertContactScreen = ({ navigation, route }) => {
             <TextInput
               placeholder='Contact Name'
               style={{ fontSize: 15, width: '100%' }}
-              value={inputForm.Name}
-              onChangeText={(text) => { handleChange('Name', text) }}
+              value={inputForm.name}
+              onChangeText={(text) => { handleChange('name', text) }}
             />
           </View>
 
@@ -129,8 +128,8 @@ const UpsertContactScreen = ({ navigation, route }) => {
               keyboardType='numeric'
               placeholder='Phone Number'
               style={{ fontSize: 15, width: '100%' }}
-              value={inputForm.PhoneNumber}
-              onChangeText={(text) => { handleChange('PhoneNumber', text) }}
+              value={inputForm.phoneNumber}
+              onChangeText={(text) => { handleChange('phoneNumber', text) }}
             />
           </View>
           {/* Email */}
@@ -138,10 +137,10 @@ const UpsertContactScreen = ({ navigation, route }) => {
             <Fontisto name="email" size={24} color="black" />
             <TextInput
               keyboardType='email-address'
-              placeholder='Email'
+              placeholder='email'
               style={{ fontSize: 15, width: '100%' }}
-              value={inputForm.Email}
-              onChangeText={(text) => { handleChange('Email', text) }}
+              value={inputForm.email}
+              onChangeText={(text) => { handleChange('email', text) }}
             />
           </View>
 

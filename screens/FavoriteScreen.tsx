@@ -11,8 +11,8 @@ const FavoriteScreen = ({navigation}) => {
   async function fetchFavoriteContact(){
     const db :SQLiteDatabase= DatabaseInstance.getInstance();
     const query = `
-      SELECT id, Name, ImageUri FROM contacts 
-      WHERE Favorite=1
+      SELECT id, name, imageUri FROM contacts 
+      WHERE favorite=1
     `
     await db.transactionAsync(async(tx)=>{
       const result = await tx.executeSqlAsync(query, []);
