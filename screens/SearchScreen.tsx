@@ -4,27 +4,27 @@ import { Text, View, TextInput, StyleSheet} from 'react-native'
 import { DatabaseInstance } from '../db/db';
 import ContactList from '../components/ContactList';
 
-// const SearchHeader = ({ onChangeText ,inputRef }) => {
-const SearchHeader = ( ) => {
+const SearchHeader = ({ onChangeText ,inputRef }) => {
+// const SearchHeader = ( ) => {
   console.log("Rendering Search Header")
   useEffect(()=>{
     console.log("Search Header Mounted.....");
   // Set the focus when the screen is mounted
-    // if (inputRef.current) {
-    //   console.log("its not null... settting the Focus .. ..")
-    //   setTimeout(() => {
-    //     inputRef.current.focus();
-    //   }, 100);
-    // }
+    if (inputRef.current) {
+      console.log("its not null... settting the Focus .. ..")
+      setTimeout(() => {
+        inputRef.current.focus();
+      }, 100);
+    }
   },[]);
 
   return (
     <View style={styles.searchContainer}>
       <TextInput
-        // ref={inputRef}
+        ref={inputRef}
         style={styles.searchInput}
         placeholder="Search..."
-        // onChangeText={onChangeText}
+        onChangeText={onChangeText}
       />
     </View>
   );
@@ -34,16 +34,23 @@ const SearchScreen = ({navigation}) => {
   console.log("Rendering Search Screen")
 
   const [contactList, setContactList] = useState([]);
-  // const [filteredContactList, setFilteredContactList] = useState([]);
+  const [filteredContactList, setFilteredContactList] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
-  // const [isLoaded, setIsLoaded] = useState(false);
-  // const searchInputRef = useRef(null);
+  
+  const searchInputRef = useRef(null);
 
-  // async function onChangeText(queryText){
-  //   console.log(queryText.trim());
-  //   // console.log(contactList);
-  //   console.log(dataLoading);
-  // }
+  async function onChangeText(queryText){ 
+    console.log(queryText.trim());
+    if(queryText.trim()==""){
+      setFilteredContactList([]);
+      return;
+    }
+    setFilteredContactList(contactList.filter(c=>{
+      return ( c.Name.toUpperCase().includes(queryText.toUpperCase())||
+      c.PhoneNumber.toUpperCase().includes(queryText.toUpperCase())||
+      c.Email.toUpperCase().includes(queryText.toUpperCase()))
+    }));
+  }
 
   async function loadData(){
     const db:SQLiteDatabase = DatabaseInstance.getInstance();
@@ -64,24 +71,27 @@ const SearchScreen = ({navigation}) => {
     console.log("Contact list:", contactList);
    if(contactList.length!=0){
     setDataLoading(false);
-    navigation.setOptions({
-      // headerTitle: ()=> <SearchHeader onChangeText={onChangeText} inputRef={searchInputRef}/>,
-      headerTitle: ()=> <SearchHeader />,
-      headerBackTitle:'Back',
-      headerBackTitleStyle: {
-        fontSize: 16, // change font size
-        color: 'red', // change font color
-      },
-      headerTitleAlign: 'center'
-    });
    }
   },[contactList])
 
+  useEffect(()=>{
+    if(dataLoading==false){
+      navigation.setOptions({
+        headerTitle: ()=> <SearchHeader onChangeText={onChangeText} inputRef={searchInputRef}/>,
+        // headerTitle: ()=> <SearchHeader />,
+        // headerLargeTitle:true, 
+        // headerSearchBarOptions:{
+        //   placeholder:"Search",
+        //   onChangeText: (event)=>{onChangeText(event.nativeEvent.text)}
+        // }
+      });
+    }
+  },[dataLoading])
  
 
   return (
     <View style={styles.container}>
-      <ContactList navigation={navigation} contactList={contactList}/>
+      <ContactList navigation={navigation} contactList={filteredContactList}/>
     </View>
   )
 }
