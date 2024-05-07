@@ -4,56 +4,69 @@ import { Text, View, TextInput, StyleSheet} from 'react-native'
 import { DatabaseInstance } from '../db/db';
 import ContactList from '../components/ContactList';
 
-const SearchHeader = ({ onChangeText, inputRef }) => {
-  console.log("Search Header Mounted")
-   useEffect(()=>{
+// const SearchHeader = ({ onChangeText ,inputRef }) => {
+const SearchHeader = ( ) => {
+  console.log("Rendering Search Header")
+  useEffect(()=>{
+    console.log("Search Header Mounted.....");
   // Set the focus when the screen is mounted
-  console.log("into use Effect of search header");
-    if (inputRef.current) {
-      console.log("its not null... settting the Focus .. ..")
-      setTimeout(() => {
-        inputRef.current.focus();
-      }, 100);
-    }
+    // if (inputRef.current) {
+    //   console.log("its not null... settting the Focus .. ..")
+    //   setTimeout(() => {
+    //     inputRef.current.focus();
+    //   }, 100);
+    // }
   },[]);
+
   return (
     <View style={styles.searchContainer}>
       <TextInput
-        ref={inputRef}
+        // ref={inputRef}
         style={styles.searchInput}
         placeholder="Search..."
-        onChangeText={onChangeText}
+        // onChangeText={onChangeText}
       />
     </View>
   );
 };
 
 const SearchScreen = ({navigation}) => {
-  console.log("Search Screen Mounted");
-  const [contactList, setContactList] = useState([]);
-  // const [isLoaded, setIsLoaded] = useState(false);
-  const searchInputRef = useRef(null);
+  console.log("Rendering Search Screen")
 
-  async function onChangeText(queryText){
-    console.log(queryText.trim());
-    const query = `
-      SELECT * FROM contacts 
-      WHERE Name Like ?
-    `
-    try {
-      const db:SQLiteDatabase = DatabaseInstance.getInstance();
-      await db.transactionAsync(async(tx)=>{
-        const result = await tx.executeSqlAsync(query,[`%${queryText}%`]);
-        setContactList(result.rows);
-      })
-    } catch (error) {
-      
-    }
+  const [contactList, setContactList] = useState([]);
+  // const [filteredContactList, setFilteredContactList] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
+  // const [isLoaded, setIsLoaded] = useState(false);
+  // const searchInputRef = useRef(null);
+
+  // async function onChangeText(queryText){
+  //   console.log(queryText.trim());
+  //   // console.log(contactList);
+  //   console.log(dataLoading);
+  // }
+
+  async function loadData(){
+    const db:SQLiteDatabase = DatabaseInstance.getInstance();
+    var result=null;
+    await db.transactionAsync(async(tx)=>{
+      result = await tx.executeSqlAsync('Select * from Contacts', []);
+    })
+    // console.log(result.rows);
+    setContactList(result.rows);
   }
 
   useEffect(()=>{
+    console.log("Search Screen Mounted")
+    loadData();
+  },[])
+
+  useEffect(()=>{
+    console.log("Contact list:", contactList);
+   if(contactList.length!=0){
+    setDataLoading(false);
     navigation.setOptions({
-      headerTitle: ()=> <SearchHeader onChangeText={onChangeText} inputRef={searchInputRef}/>,
+      // headerTitle: ()=> <SearchHeader onChangeText={onChangeText} inputRef={searchInputRef}/>,
+      headerTitle: ()=> <SearchHeader />,
       headerBackTitle:'Back',
       headerBackTitleStyle: {
         fontSize: 16, // change font size
@@ -61,7 +74,8 @@ const SearchScreen = ({navigation}) => {
       },
       headerTitleAlign: 'center'
     });
-  },[])
+   }
+  },[contactList])
 
  
 

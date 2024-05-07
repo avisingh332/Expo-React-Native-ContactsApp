@@ -1,6 +1,5 @@
 import React from 'react'
 import { View, ScrollView, Text, TouchableOpacity, StyleSheet, Image } from 'react-native'
-// import { FontAwesome6 } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 const ContactList = ({contactList,navigation}) => {
   return (
@@ -20,8 +19,10 @@ const ContactList = ({contactList,navigation}) => {
                     <View style={styles.imageContainer}>
                       <Image resizeMode='contain' source={{uri:item.ImageUri}} style={styles.image}/>
                     </View>
-                    <Text style={{marginStart:10, alignItems:'center'}}>{item.Name}</Text>
-                    <AntDesign name="rightcircleo" size={24} color="black" />
+                    <View style={{flex:1, flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                      <Text style={{marginStart:20, alignItems:'center',fontSize:20}}>{item.Name}</Text>
+                      <AntDesign name="rightcircleo" size={30} color="black" />
+                    </View>
                 </TouchableOpacity>
                 )
             })
