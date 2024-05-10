@@ -16,3 +16,14 @@ export default function App() {
   );
 }
 
+<sharedStackNavigator>
+  <TabNavigator>
+    <HomeStackNavigator>
+      <HomeScreen/>
+    </HomeStackNavigator>
+    <FavoriteStackNavigator>
+      <FavoriteScren/>
+    </FavoriteStackNavigator>
+  </TabNavigator>
+  <DetailsScreen />
+</sharedStackNavigator>

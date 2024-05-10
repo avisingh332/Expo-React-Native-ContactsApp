@@ -4,9 +4,19 @@ import { AntDesign } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { deleteRecord } from '../db/db';
 import ConfirmationBox from './ConfirmationBox';
+import { NavigationProp } from '@react-navigation/native';
 
-
-const ContactList = ({ contactList, navigation, setIsLoaded }) => {
+interface contactType{
+  id:number,
+  imageUri:string,
+  name:string,
+};
+interface MyComponentProps {
+  contactList: contactType[]; // List of items
+  navigation: NavigationProp<any>; // Use the appropriate navigation type
+  setIsLoaded: (isLoaded: boolean) => void;
+}
+const ContactList: React.FC<MyComponentProps> = ({ contactList, navigation, setIsLoaded }) => {
   const contactListWithkey = contactList.map((item,index)=>({...item,key:index+1}))
   const [showConfirmationBox, setShowConfirmationBox]  = useState(false);
   const [contactToDelete, setContactToDelete] = useState(null);
