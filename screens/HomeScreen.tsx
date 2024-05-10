@@ -10,19 +10,20 @@ import ContactList from '../components/ContactList';
 const HomeScreen = ({navigation}) => {
   const [contactList, setContactList] = useState([]);
   const isFocused = useIsFocused();
-
+  const [isLoaded, setIsLoaded] = useState(true);
   const loadData = async()=>{
     // await dropTable();
     await createTables();
     let res = await getContacts();
     setContactList(res);
+    setIsLoaded(true);
   }
   
   useEffect(()=>{
-    if(isFocused==true){
+    if(isFocused==true || isLoaded ==false){
       loadData();
     }
-  },[isFocused])
+  },[isFocused, isLoaded])
 
   return (
     <View style={styles.container}>
@@ -41,7 +42,7 @@ const HomeScreen = ({navigation}) => {
 
         {/* BodySection */}
         <View style={styles.bodySection}>
-          <ContactList contactList={contactList} navigation={navigation}/>
+          <ContactList contactList={contactList} navigation={navigation} setIsLoaded={setIsLoaded}/>
         </View>
         {/* Addcontact Button */}
         <TouchableOpacity style={styles.addContactButton}

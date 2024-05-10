@@ -3,10 +3,11 @@ import { Image, Text, View, StyleSheet, TextInput, TouchableOpacity, Alert, Scro
 import { MaterialIcons } from '@expo/vector-icons';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
-import { upsertContact } from '../db/db';
+import { DatabaseInstance, upsertContact } from '../db/db';
 import { EventRegister } from 'react-native-event-listeners';
 import * as ImagePicker from 'expo-image-picker';
 import { deleteImage, storeImageLocally } from '../utility/SaveImageLocally';
+import { SQLiteDatabase } from 'expo-sqlite';
 
 const UpsertContactScreen = ({ navigation, route }) => {
   const [isUpdateRequest, setIsUpdateRequest] = useState(false);
@@ -20,9 +21,9 @@ const UpsertContactScreen = ({ navigation, route }) => {
     imageUri:'',
   });
 
-  const fireEvent = () => {
-    EventRegister.emitEvent('reloadContacts', "Event Triggered");
-  }
+  // const fireEvent = () => {
+  //   EventRegister.emitEvent('reloadContacts', "Event Triggered");
+  // }
 
   const handleChange = (field: string, value: string) => {
     setInputForm({
@@ -78,24 +79,34 @@ const UpsertContactScreen = ({ navigation, route }) => {
   }, [image]);
 
   useEffect(() => {
-    
-    if (route.params?.details != null) {
-
-      const details = route.params?.details;
-      console.log("Details Got through Param are: ", details);
+    console.log("Route Details is ", route.params);
+    if (route.params?.id != null) {
+      console.log(route.params?.id);
       setIsUpdateRequest(true);
-      setInputForm({
-        id: details.id,
-        name: details.name,
-        phoneNumber: details.phoneNumber,
-        email: details.email,
-        favorite: details.favorite,
-        imageUri:details.imageUri
-      });
-      setImage(details.imageUri)
-      navigation.setOptions({
-        title: 'Update Contact'
-      })
+      const loadDetails = async()=>{
+        try{
+          const db:SQLiteDatabase = DatabaseInstance.getInstance();
+          await db.transactionAsync(async(tx)=>{
+            const result = await tx.executeSqlAsync('SELECT * FROM contacts WHERE id=?',[route.params.id]);
+            const details = result.rows[0];
+            setInputForm({
+              id: details.id,
+              name: details.name,
+              phoneNumber: details.phoneNumber,
+              email: details.email,
+              favorite: details.favorite,
+              imageUri:details.imageUri
+            });
+            setImage(details.imageUri)
+            navigation.setOptions({
+              title: 'Update Contact'
+            })
+          })
+        } catch(error){
+          throw error;
+        }
+      }
+      loadDetails();
     }
   }, []);
 

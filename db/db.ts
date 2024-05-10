@@ -116,8 +116,8 @@ export const upsertContact = async (values) => {
         const db = DatabaseInstance.getInstance();
 
         await db.transactionAsync(async (tx) => {
-            const result = await tx.executeSqlAsync(values.isUpdateRequest?updateQuery:insertQuery, 
-                [values.name, values.email, values.phoneNumber,values.favorite, values.imageUri,values.id]);
+            const result = await tx.executeSqlAsync(values.isUpdateRequest ? updateQuery : insertQuery,
+                [values.name, values.email, values.phoneNumber, values.favorite, values.imageUri, values.id]);
             // console.log({result});
         });
 
@@ -205,5 +205,20 @@ export const getColumns = async () => {
         })
     } catch (error) {
         console.log(error);
+    }
+}
+
+export const deleteRecord = async (id: number) => {
+    try {
+
+        const db = DatabaseInstance.getInstance();
+        await db.transactionAsync(async (tx) => {
+            await tx.executeSqlAsync("DELETE FROM contacts WHERE id=?", [id]);
+            console.log("Contact Deleted from Database!!");
+        })
+
+    }
+    catch (error) {
+        throw (error);
     }
 }

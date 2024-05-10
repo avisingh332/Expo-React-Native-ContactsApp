@@ -43,19 +43,17 @@ const DetailsScreen = ({ navigation, route }) => {
       SET  favorite = ?
       WHERE id= ?
     `;
-    console.log("Details Before favorite:", details);
     const favorite = details.favorite == 1 ? 0 : 1;
-    console.log("Value of Favorite to be Setted: ", favorite);
     const db: SQLiteDatabase = DatabaseInstance.getInstance();
     await db.transactionAsync(async (tx) => {
       await tx.executeSqlAsync(query, [favorite, details.id]);
-      console.log(`${favorite ? 'Added' : 'Removed'}  Favorite`);
+      // console.log(`${favorite ? 'Added' : 'Removed'}  Favorite`);
     })
     loadData();
   }
 
   async function handleEdit() {
-    navigation.navigate('UpsertContact', { details: details })
+    navigation.navigate('UpsertContact', { id: details.id })
   }
 
   useEffect(() => {
