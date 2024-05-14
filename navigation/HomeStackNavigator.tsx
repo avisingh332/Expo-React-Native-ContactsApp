@@ -6,13 +6,10 @@ import UpsertContactScreen from '../screens/UpsertContactScreen';
 
 const HomeStack = createNativeStackNavigator();
 
-export default function HomeTabNavigator(){
+export default function HomeStackNavigator(){
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Home" options={{headerShown:false}} component={HomeScreen} />
-      {/* <HomeStack.Screen name="Details" component ={DetailsScreen} options={{
-        title:''
-      }} /> */}
       <HomeStack.Screen name="Search" component ={SearchScreen}/>
       <HomeStack.Screen name="UpsertContact" component={UpsertContactScreen}/>
     </HomeStack.Navigator>
